@@ -11,12 +11,20 @@ monolith with extra steps and is being reworked.
 Zero platform crates in the dependency tree. The app is a pure **API
 client** of the platform:
 
-1. **Decision API (the dogfood surface).** Question authoring and answering
-   speak the jev-1 wire JSON against the platform's decision service — the
-   P0.7 stub today (`POST /v1/systemone`), the InferenceService decision
-   surface (P3.1) later. `src/subject.rs` is the HTTP client
-   (`SYNTHESIS_SUBJECT_URL`, default `http://127.0.0.1:8080`); the
-   deterministic `HashTeacher` stays for reproducible tests.
+1. **Decision API planes (the dogfood surface) — pluggable subject.**
+   Question answering goes through a `Subject` trait with one client per
+   platform API plane, so the app dogfoods whichever plane is live:
+
+   | plane | transport | status |
+   |-------|-----------|--------|
+   | jev-1 HTTP/JSON | `POST /v1/systemone` (P0.7 stub; `SYNTHESIS_SUBJECT_URL`) | **live today** — first client |
+   | RPC decisions API | Cap'n Proto generated client (hyprstream-rpc-std `decision` schema) over the RPC transports | lands with P3.1's service registration |
+   | Flight SQL / ADBC | Arrow batches via the P3.5 `decide()` operator | lands with P3.5 |
+
+   Client libraries for a plane are the platform's *public SDK* (generated
+   RPC clients, ADBC driver) — that is API usage, not internal linking.
+   The deterministic `HashTeacher` stays for reproducible tests. Each new
+   plane adds dogfood coverage of that platform surface.
 2. **Artifacts by digest.** The frozen benchmark manifest + DISCLOSURE are
    consumed as *files supplied by the operator* (path or URL) and verified
    locally by their pinned BLAKE3 digests — no platform crate needed to

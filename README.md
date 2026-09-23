@@ -47,9 +47,10 @@ recorded with ToS classes in `DISCLOSURE.md`.
 This repository is a **standalone application** that builds against the
 hyprstream platform's **APIs** — it is a client, not a platform crate:
 
-- **Decision API**: question specs and answers speak the jev-1 wire JSON to
-  the platform decision service (`SYNTHESIS_SUBJECT_URL`; the P0.7 stub for
-  development, the InferenceService decision surface for production).
+- **Decision API planes** (pluggable `Subject` clients): jev-1 HTTP/JSON
+  against the P0.7 stub (`SYNTHESIS_SUBJECT_URL`, live today); the RPC
+  decisions API (Cap'n Proto generated clients, with P3.1); and Flight
+  SQL/ADBC Arrow batches via the P3.5 `decide()` operator.
 - **Artifacts by digest**: the frozen benchmark manifest + DISCLOSURE are
   operator-supplied files verified locally by their pinned BLAKE3 digests
   (`SYNTHESIS_BENCH_ROOT`).
