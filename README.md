@@ -42,30 +42,20 @@ P0.4 eval harness / P1.4 training loop; the roster JSON is the integration
 contract. The teacher roster itself is authorized by humans out-of-band and
 recorded with ToS classes in `DISCLOSURE.md`.
 
-## Standalone app — dogfooding the platform
+## Standalone app — API-client dogfood
 
-This repository is a **standalone application**, not a platform crate: it
-*consumes* the hyprstream platform and is the dogfood proof that the
-platform's published contracts are sufficient to build on. Exactly two
-platform contracts cross the boundary:
+This repository is a **standalone application** that builds against the
+hyprstream platform's **APIs** — it is a client, not a platform crate:
 
-- `hyprstream-decision` — the jev-1 decision IR types,
-- `hyprstream-bench` — the frozen vob-1.1 manifest + DISCLOSURE pins.
+- **Decision API**: question specs and answers speak the jev-1 wire JSON to
+  the platform decision service (`SYNTHESIS_SUBJECT_URL`; the P0.7 stub for
+  development, the InferenceService decision surface for production).
+- **Artifacts by digest**: the frozen benchmark manifest + DISCLOSURE are
+  operator-supplied files verified locally by their pinned BLAKE3 digests
+  (`SYNTHESIS_BENCH_ROOT`).
 
-Default layout is a sibling checkout (path dependencies resolve to
-`../hyprstream/crates/...`):
-
-```
-parent/
-├── hyprstream/              # the platform (github.com/hyprstream/hyprstream)
-└── hyprstream-synthesis/    # this app
-```
-
-Other layouts: set `SYNTHESIS_BENCH_ROOT` to the platform's
-`crates/hyprstream-bench` directory for the firewall pins, and adjust the
-path dependencies in `Cargo.toml` for the two platform libraries. CI checks
-the platform out at `hyprstream/` inside the workspace, which matches the
-default layout.
+Zero hyprstream crates in the dependency tree. See
+`EXTRACTION-REVISION.md` for the architecture correction and status.
 
 ## Licensing
 
