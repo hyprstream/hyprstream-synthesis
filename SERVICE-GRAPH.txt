@@ -1,0 +1,48 @@
+
+
+ ┌────────────────────────────┐                        ┌──────────────────────────────────────────┐
+ │TypeSafe SDKs / external    │───────────────────────▶│jev-1 HTTP/JSON — decision API            │
+ │jev-1 consumers             │                        │P0.7 stub (LIVE) → P3.1                   │◁┐
+ └────────────────────────────┘                 └─────▶│InferenceService surface                  │ │
+                                                │      └──────────────────────────────────────────┘ │
+                                                │                                                   │
+ ┌────────────────────────────┐                 │                                                   │
+ │hyprstream-eval             │                 │      ┌──────────────────────────────────────────┐ │
+ │(in-workspace REFERENCE     │─────────────────┘      │metrics-api + engine (core)               │ │
+ │consumer)                   │                        │audit trail / persistence                 │ │
+ │• jev-1 subject client      │───────────────────────▶│(P0.3; P3.4 persistence)                  │ │
+ │• audit → metrics-api       │                        └──────────────────────────────────────────┘ │
+ │• vob pins (digest)         │                                                                     │
+ └────────────────────────────┘                                                                     │
+                                                       ┌──────────────────────────────────────────┐ │
+                                                     ┊ │RPC decisions — decision.capnp            │ │
+ ┌────────────────────────────┐                      ┊ │generated clients                         │ │
+ │hyprstream-synthesis        │                      ┌▷│(service with P3.1)                       │ │
+ │(standalone app, P1.3b)     │                      ┊ └──────────────────────────────────────────┘ │
+ │                            │                      ┊                                              │
+ │Subject clients:            │──────────────────────┼──────────────────────────────────────────────┘
+ │• jev-1 HTTP  [LIVE]        │                      ┊ ┌──────────────────────────────────────────┐
+ │• RPC decisions  [P3.1]     │┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘ │Flight SQL/ADBC                           │
+ │• Flight SQL/ADBC  [P3.5]   │                        │P3.5 decide() operator                    │
+ │                            │┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄▷│(Arrow batches)                           │
+ │artifact pins: BLAKE3       │                        └──────────────────────────────────────────┘
+ │digests (vs bench)          │
+ └────────────────────────────┘
+               │                                       ┌──────────────────────────────────────────┐
+               │                                       │hyprstream-bench — frozen vob-1.1         │
+               │──────────────────────────────────────▶│manifest + DISCLOSURE pins                │
+                                                       │(consumed artifact, digest-checked)       │
+                                                       └──────────────────────────────────────────┘
+
+
+                                                       ┌──────────────────────────────────────────┐
+                                                       │PLATFORM CORE (in-workspace libs/services)│
+                                                       │◄ HTTP · RPC · Flight planes encode:      │
+                                                       │   hyprstream-decision IR (types)         │
+                                                       │◄ served by: InferenceService runtime     │
+                                                       │also: hyprstream-calibration,             │
+                                                       │registry/git2db · PolicyService+MAC       │
+                                                       │+UCAN · rpc transports · MoQ planes       │
+                                                       │                                          │
+                                                       └──────────────────────────────────────────┘
+
