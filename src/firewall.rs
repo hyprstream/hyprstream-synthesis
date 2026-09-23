@@ -84,6 +84,21 @@ impl std::error::Error for FirewallError {}
 /// (`<root>/crates/hyprstream-bench/manifest/<file>`); falls back to the
 /// manifest's parent's parent so a copied layout still resolves — and still
 /// fails closed (`DisclosureIo`) if the file is absent.
+/// Root of the `hyprstream-bench` checkout holding the frozen manifest and
+/// DISCLOSURE. Defaults to the dogfood sibling layout (`../hyprstream-bench`
+/// relative to this crate — the platform workspace, when this app is cloned
+/// as a sibling of `hyprstream`); override with `SYNTHESIS_BENCH_ROOT` for
+/// other checkouts (CI uses a platform checkout at `../hyprstream`, which
+/// the default already matches).
+pub fn bench_root() -> std::path::PathBuf {
+    std::env::var_os("SYNTHESIS_BENCH_ROOT")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| {
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../hyprstream/crates/hyprstream-bench")
+        })
+}
+
 fn disclosure_path_for(manifest_path: &Path, manifest: &Manifest) -> Option<std::path::PathBuf> {
     let embedded = Path::new(&manifest.disclosure.path);
     if let Some(root) = manifest_path.ancestors().nth(4) {
@@ -261,8 +276,7 @@ mod tests {
     use super::*;
 
     fn committed_manifest_path() -> std::path::PathBuf {
-        Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../hyprstream-bench/manifest/vob-1.1.manifest.json")
+        bench_root().join("manifest/vob-1.1.manifest.json")
     }
 
     #[test]
@@ -303,7 +317,7 @@ mod tests {
     }
 
     fn committed_disclosure_path() -> std::path::PathBuf {
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../hyprstream-bench/DISCLOSURE.md")
+        bench_root().join("DISCLOSURE.md")
     }
 
     #[test]
@@ -361,7 +375,7 @@ mod tests {
         // Regression (review): checking only the manifest's embedded
         // disclosure digest let a drifted or deleted DISCLOSURE.md pass.
         let committed = std::fs::read(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../hyprstream-bench/DISCLOSURE.md"),
+            bench_root().join("DISCLOSURE.md"),
         )
         .unwrap();
 

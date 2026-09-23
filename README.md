@@ -42,9 +42,34 @@ P0.4 eval harness / P1.4 training loop; the roster JSON is the integration
 contract. The teacher roster itself is authorized by humans out-of-band and
 recorded with ToS classes in `DISCLOSURE.md`.
 
+## Standalone app — dogfooding the platform
+
+This repository is a **standalone application**, not a platform crate: it
+*consumes* the hyprstream platform and is the dogfood proof that the
+platform's published contracts are sufficient to build on. Exactly two
+platform contracts cross the boundary:
+
+- `hyprstream-decision` — the jev-1 decision IR types,
+- `hyprstream-bench` — the frozen vob-1.1 manifest + DISCLOSURE pins.
+
+Default layout is a sibling checkout (path dependencies resolve to
+`../hyprstream/crates/...`):
+
+```
+parent/
+├── hyprstream/              # the platform (github.com/hyprstream/hyprstream)
+└── hyprstream-synthesis/    # this app
+```
+
+Other layouts: set `SYNTHESIS_BENCH_ROOT` to the platform's
+`crates/hyprstream-bench` directory for the firewall pins, and adjust the
+path dependencies in `Cargo.toml` for the two platform libraries. CI checks
+the platform out at `hyprstream/` inside the workspace, which matches the
+default layout.
+
 ## Licensing
 
-Apache-2.0. This crate is a `permissive_roots` member
-(`.github/license-boundary.toml`): no dependency path to any AGPL crate.
-Corpus distributability additionally depends on the teacher roster's ToS
-classes — see `DISCLOSURE.md`.
+Apache-2.0. Permissive-only by policy: no dependency path to any AGPL crate
+(the corpus export and this harness feed the MIT-licensed flagship model
+artifact). Corpus distributability additionally depends on the teacher
+roster's ToS classes — see `DISCLOSURE.md`.

@@ -1,26 +1,34 @@
+[workspace]
+members = ["."]
+resolver = "2"
+
 [package]
 name = "hyprstream-synthesis"
 version = "0.1.0"
-edition.workspace = true
+edition = "2021"
 license = "Apache-2.0"
-repository.workspace = true
+repository = "https://github.com/hyprstream/hyprstream-synthesis.git"
 description = "Teacher-agnostic synthetic corpus pipeline (System One P1.3): (state, question spec, answer) triples with mandatory option-order permutation + rubric paraphrase augmentation, raw per-teacher probability vectors, provenance + distributability flags, and the family/item contamination firewalls against the frozen vob-1.1 benchmark manifest"
 
 # Deliberately dependency-light and permissive-only: the publishable corpus
 # export and this harness feed the MIT-licensed flagship model artifact, so
-# this crate must never depend on an AGPL crate (license-boundary.toml
-# `permissive_roots`). Encumbered teacher rows are flagged and excluded from
-# publishable exports.
+# this crate must never depend on an AGPL crate. Encumbered teacher rows are
+# flagged and excluded from publishable exports.
+#
+# This is a STANDALONE application that consumes the hyprstream platform
+# (dogfood consumer): the decision IR and the benchmark firewall artifact
+# come from a sibling platform checkout (default `../hyprstream`, see
+# README.md). Platform contracts crossing this boundary are exactly two:
+# `hyprstream-decision` (the jev-1 IR types) and `hyprstream-bench` (the
+# frozen manifest + DISCLOSURE pins).
 [dependencies]
-hyprstream-bench = { version = "0.1", path = "../hyprstream-bench" }
-hyprstream-decision = { version = "0.1", path = "../hyprstream-decision" }
-blake3 = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
+hyprstream-bench = { version = "0.1", path = "../hyprstream/crates/hyprstream-bench" }
+hyprstream-decision = { version = "0.1", path = "../hyprstream/crates/hyprstream-decision" }
+blake3 = "1.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 
-[lints]
-workspace = true
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-
-workspace-hack = { version = "0.1", path = "../../workspace-hack" }
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+mem_forget = "deny"

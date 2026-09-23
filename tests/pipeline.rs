@@ -18,8 +18,8 @@ use hyprstream_synthesis::pipeline::{run, SynthConfig, SynthError};
 use hyprstream_synthesis::teacher::{HashTeacher, Teacher, TeacherPin, TosClass};
 
 fn manifest_path() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../hyprstream-bench/manifest/vob-1.1.manifest.json")
+    hyprstream_synthesis::firewall::bench_root()
+        .join("manifest/vob-1.1.manifest.json")
 }
 
 fn firewall() -> Firewall {
