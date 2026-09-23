@@ -1,3 +1,9 @@
+> **ARCHIVED (owner decision, 2026-09-22 — never consumed).** The synthesis
+> pipeline lives in the platform monorepo:
+> [`hyprstream/hyprstream` → `crates/hyprstream-synthesis`](https://github.com/hyprstream/hyprstream),
+> program boundary enforced in CI by `scripts/check_program_boundaries.py`.
+> This repository is preserved read-only for its extraction experiment history.
+
 # hyprstream-synthesis
 
 Teacher-agnostic synthetic corpus pipeline — System One program, DAG node **P1.3**.
